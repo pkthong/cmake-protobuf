@@ -1,4 +1,5 @@
 option(protobuf_BUILD_SHARED_LIBS "Build Protobuf as Shared Library" OFF)
+option(protobuf_BUILD_TESTS "Build Protobuf Tests" ON)
 
 # Useful CMake helper functions
 include(cmake/FlagUtilities.cmake)
@@ -295,6 +296,41 @@ if (protobuf_BUILD_SHARED_LIBS)
    set_target_properties(libprotobuf_lite
       PROPERTIES
       COMPILE_DEFINITIONS "PROTOBUF_USE_DLLS=1")
+endif()
+
+if (protobuf_BUILD_TESTS)
+   include_directories(${protobuf_BINARY_DIR})
+   # Define protobuf_lite source files
+   set (protobuf_lite_test_SRCS
+      src/google/protobuf
+      src/google/protobuf/lite_unittest.cc
+      src/google/protobuf/test_util_lite.cc
+      ${protobuf_BINARY_DIR}/google/protobuf/unittest_import_lite.pb.cc
+      ${protobuf_BINARY_DIR}/google/protobuf/unittest_import_public_lite.pb.cc
+      ${protobuf_BINARY_DIR}/google/protobuf/unittest_lite.pb.cc
+      )
+   ADD_CUSTOM_COMMAND(
+      OUTPUT ${protobuf_BINARY_DIR}/google/protobuf/unittest_import_lite.pb.cc
+      COMMAND protoc -I${protobuf_SOURCE_DIR}/src --cpp_out=${protobuf_BINARY_DIR} ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_lite.proto
+      DEPENDS protoc ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_lite.proto
+      WORKING_DIRECTORY ${protobuf_BINARY_DIR}/Debug
+      )
+
+   ADD_CUSTOM_COMMAND(
+      OUTPUT ${protobuf_BINARY_DIR}/google/protobuf/unittest_import_public_lite.pb.cc
+      COMMAND protoc -I${protobuf_SOURCE_DIR}/src --cpp_out=${protobuf_BINARY_DIR} ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_public_lite.proto
+      DEPENDS protoc ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_public_lite.proto
+      WORKING_DIRECTORY ${protobuf_BINARY_DIR}/Debug
+      )
+   ADD_CUSTOM_COMMAND(
+      OUTPUT ${protobuf_BINARY_DIR}/google/protobuf/unittest_lite.pb.cc
+      COMMAND protoc -I${protobuf_SOURCE_DIR}/src --cpp_out=${protobuf_BINARY_DIR} ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_lite.proto
+      DEPENDS protoc ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_lite.proto
+      WORKING_DIRECTORY ${protobuf_BINARY_DIR}/Debug
+      )
+
+   add_executable(protobuf_lite_test ${protobuf_lite_test_SRCS})
+   target_link_libraries(protobuf_lite_test libprotobuf_lite)
 endif()
 
 # Tests
