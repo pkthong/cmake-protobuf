@@ -120,9 +120,9 @@
 //# define _ALL_SOURCE
 //#endif
 /* Enable GNU extensions on systems that have them.  */
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
+//#ifndef _GNU_SOURCE
+//# define _GNU_SOURCE
+//#endif
 /* Enable threading extensions on Solaris.  */
 //#ifndef _POSIX_PTHREAD_SEMANTICS
 //# define _POSIX_PTHREAD_SEMANTICS

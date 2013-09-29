@@ -2,7 +2,6 @@ option(protobuf_BUILD_SHARED_LIBS "Build Protobuf as Shared Library" OFF)
 option(protobuf_BUILD_TESTS "Build Protobuf Tests" ON)
 
 # Useful CMake helper functions
-#set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(cmake/FlagUtilities.cmake)
 include (CheckFunctionExists)
 include (CheckIncludeFile)
@@ -13,14 +12,15 @@ include (CheckTypeSize)
 include (CheckCXXSourceCompiles)
 include (CheckCSourceCompiles)
 
-# Protocol Buffers with CMake   
+# Protocol Buffers with CMake
 PROJECT(protobuf C CXX)
 
 cmake_minimum_required(VERSION 2.8)
 
-find_package(Threads REQUIRED)
+# Include Dirs ..
 include_directories(src src/google/protobuf ${CMAKE_CURRENT_BINARY_DIR})
 
+# Sources ..
 set(protobuf_COMMON_SRCS
    src/google/protobuf/stubs/atomicops.h
    src/google/protobuf/stubs/atomicops_internals_arm_gcc.h
@@ -234,97 +234,105 @@ set(protoc_SRCS
    src/google/protobuf/compiler/main.cc
    )
 
+# Platform specific defines ..
 if(WIN32)
-   include_directories(vsprojects)
-   #   add_definitions(-D_WIN32 -DLIBPROTOBUF_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
    ADD_COMPILER_FLAGS("-wd4244 -wd4996 -D_WIN32 -DLIBPROTOBUF_EXPORTS -D_CRT_SECURE_NO_WARNINGS" CACHE)
 else()
     # POSIX common
    ADD_COMPILER_FLAGS("-D_GNU_SOURCE" CACHE)
-   check_library_exists("c" ftruncate "" HAVE_FTRUNCATE)
-   check_library_exists("c" memset "" HAVE_MEMSET)
-   check_library_exists("c" mkdir "" HAVE_MKDIR)
-   check_library_exists("c" strchr "" HAVE_STRCHR)
-   check_library_exists("c" strtol "" HAVE_STRTOL)
-   CHECK_INCLUDE_FILES(dlfcn.h HAVE_DLFCN_H)
-   CHECK_INCLUDE_FILES(fcntl.h HAVE_FCNTL_H)
-   CHECK_INCLUDE_FILES(inttypes.h HAVE_INTTYPES_H)
-   CHECK_INCLUDE_FILES(limits.h HAVE_LIMITS_H)
-   CHECK_INCLUDE_FILES(stdlib.h HAVE_STDLIB_H)
-   CHECK_INCLUDE_FILES(stdint.h HAVE_STDINT_H)
-   CHECK_INCLUDE_FILES(unistd.h HAVE_UNISTD_H)
-   CHECK_INCLUDE_FILES(memory.h HAVE_MEMORY_H)
-   CHECK_INCLUDE_FILES(strings.h HAVE_STRINGS_H)
-   CHECK_INCLUDE_FILES(string.h HAVE_STRING_H)
-   CHECK_INCLUDE_FILES("stdlib.h;stdarg.h;float.h;string.h" STDC_HEADERS)
-   CHECK_INCLUDE_FILES("sys/stat.h" HAVE_SYS_STAT_H)
-   CHECK_INCLUDE_FILES("sys/types.h" HAVE_SYS_TYPES_H)
-
-   # TODO Move to separate cmake file
-   if (NOT HAVE_HASH_MAP)
-      foreach(hashMapName hash_map unordered_map)
-         foreach(hashMapLocation "<${hashMapName}>" "<tr1/${hashMapName}>")
-            foreach(hashMapNamespace std std::tr1 stdext)
-               if (NOT hashMapFound)
-                  set( hashMapTest "
-                     #include ${hashMapLocation}
-                     int main(int argc, char * argv[]) 
-                     { 
-                        const ${hashMapNamespace}::${hashMapName}<int, int> t;
-                        return t.find(4) == t.end();
-                     }")
-                  CHECK_CXX_SOURCE_COMPILES("${hashMapTest}" HAVE_HASH_MAP)
-                  if(HAVE_HASH_MAP)
-                     set(HASH_MAP_H ${hashMapLocation} CACHE STRING "HASH_MAP_H")
-                     set(HASH_NAMESPACE ${hashMapNamespace} CACHE STRING "")
-                     set(HASH_MAP_CLASS ${hashMapName} CACHE STRING "")
-                     set(hashMapFound 1)
-                  else()
-                     unset(HAVE_HASH_MAP CACHE)
-                  endif()
-               endif()
-            endforeach(hashMapNamespace)
-         endforeach(hashMapLocation)
-      endforeach(hashMapName)
-   endif()
-   if (NOT HAVE_HASH_SET)
-      foreach(hashSetName hash_set unordered_set)
-         foreach(hashSetLocation "<${hashSetName}>" "<tr1/${hashSetName}>")
-            foreach(hashSetNamespace std std::tr1 stdext)
-               if (NOT hashSetFound)
-                  set( hashSetTest "
-                     #include ${hashSetLocation}
-                     int main(int argc, char * argv[]) 
-                     { 
-                        const ${hashSetNamespace}::${hashSetName}<int> t;
-                        return 0;
-                     }")
-                  CHECK_CXX_SOURCE_COMPILES("${hashSetTest}" HAVE_HASH_SET)
-                  if(HAVE_HASH_SET)
-                     set(HASH_SET_H ${hashSetLocation} CACHE STRING "")
-                     set(HASH_SET_CLASS ${hashSetName} CACHE STRING "")
-                     set(hashSetFound 1)
-                  else()
-                     unset(HAVE_HASH_SET CACHE)
-                  endif()
-               endif()
-            endforeach(hashSetNamespace)
-         endforeach(hashSetLocation)
-      endforeach(hashSetName)
-   endif()
-   # END TODO
-
-   if(Threads_FOUND)
-      set(HAVE_PTHREAD 1)
-   endif()
-   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-   ADD_COMPILER_FLAGS("-DHAVE_CONFIG_H" CACHE)
+   find_package(Threads REQUIRED)
 endif()
 
+# Check for OS support ..
+check_library_exists("c" ftruncate "" HAVE_FTRUNCATE)
+check_library_exists("c" memset "" HAVE_MEMSET)
+check_library_exists("c" mkdir "" HAVE_MKDIR)
+check_library_exists("c" strchr "" HAVE_STRCHR)
+check_library_exists("c" strtol "" HAVE_STRTOL)
+CHECK_INCLUDE_FILES(dlfcn.h HAVE_DLFCN_H)
+CHECK_INCLUDE_FILES(fcntl.h HAVE_FCNTL_H)
+CHECK_INCLUDE_FILES(inttypes.h HAVE_INTTYPES_H)
+CHECK_INCLUDE_FILES(limits.h HAVE_LIMITS_H)
+CHECK_INCLUDE_FILES(stdlib.h HAVE_STDLIB_H)
+CHECK_INCLUDE_FILES(stdint.h HAVE_STDINT_H)
+CHECK_INCLUDE_FILES(unistd.h HAVE_UNISTD_H)
+CHECK_INCLUDE_FILES(memory.h HAVE_MEMORY_H)
+CHECK_INCLUDE_FILES(strings.h HAVE_STRINGS_H)
+CHECK_INCLUDE_FILES(string.h HAVE_STRING_H)
+CHECK_INCLUDE_FILES("stdlib.h;stdarg.h;float.h;string.h" STDC_HEADERS)
+CHECK_INCLUDE_FILES("sys/stat.h" HAVE_SYS_STAT_H)
+CHECK_INCLUDE_FILES("sys/types.h" HAVE_SYS_TYPES_H)
+
+# TODO Move to separate cmake file
+if (NOT HAVE_HASH_MAP)
+   foreach(hashMapName hash_map unordered_map)
+      foreach(hashMapLocation "<${hashMapName}>" "<tr1/${hashMapName}>")
+         foreach(hashMapNamespace std std::tr1 stdext)
+            if (NOT hashMapFound)
+               set( hashMapTest "
+                  #include ${hashMapLocation}
+                  int main(int argc, char * argv[])
+                  {
+                     const ${hashMapNamespace}::${hashMapName}<int, int> t;
+                     return t.find(4) == t.end();
+                  }")
+               CHECK_CXX_SOURCE_COMPILES("${hashMapTest}" HAVE_HASH_MAP)
+               if(HAVE_HASH_MAP)
+                  set(HASH_MAP_H ${hashMapLocation} CACHE STRING "HASH_MAP_H")
+                  set(HASH_NAMESPACE ${hashMapNamespace} CACHE STRING "")
+                  set(HASH_MAP_CLASS ${hashMapName} CACHE STRING "")
+                  set(hashMapFound 1)
+               else()
+                  unset(HAVE_HASH_MAP CACHE)
+               endif()
+            endif()
+         endforeach(hashMapNamespace)
+      endforeach(hashMapLocation)
+   endforeach(hashMapName)
+endif()
+if (NOT HAVE_HASH_SET)
+   foreach(hashSetName hash_set unordered_set)
+      foreach(hashSetLocation "<${hashSetName}>" "<tr1/${hashSetName}>")
+         foreach(hashSetNamespace std std::tr1 stdext)
+            if (NOT hashSetFound)
+               set( hashSetTest "
+                  #include ${hashSetLocation}
+                  int main(int argc, char * argv[])
+                  {
+                     const ${hashSetNamespace}::${hashSetName}<int> t;
+                     return 0;
+                  }")
+               CHECK_CXX_SOURCE_COMPILES("${hashSetTest}" HAVE_HASH_SET)
+               if(HAVE_HASH_SET)
+                  set(HASH_SET_H ${hashSetLocation} CACHE STRING "")
+                  set(HASH_SET_CLASS ${hashSetName} CACHE STRING "")
+                  set(hashSetFound 1)
+               else()
+                  unset(HAVE_HASH_SET CACHE)
+               endif()
+            endif()
+         endforeach(hashSetNamespace)
+      endforeach(hashSetLocation)
+   endforeach(hashSetName)
+endif()
+# END TODO
+
+# Create config.h ..
+if(Threads_FOUND)
+   set(HAVE_PTHREAD 1)
+endif()
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+ADD_COMPILER_FLAGS("-DHAVE_CONFIG_H" CACHE)
+
+# Compile target libs ..
 add_library(libprotoc ${libprotoc_SRCS})
 add_library(libprotobuf ${libprotobuf_SRCS})
 add_library(libprotobuf_lite ${libprotobuf_lite_SRCS})
+
+# Compile target executable ..
 add_executable(protoc ${protoc_SRCS})
+
+# Link libs with targets ..
 target_link_libraries(protoc libprotoc)
 target_link_libraries(libprotoc libprotobuf)
 
@@ -340,14 +348,16 @@ if (protobuf_BUILD_SHARED_LIBS)
       COMPILE_DEFINITIONS "PROTOBUF_USE_DLLS=1")
 endif()
 
+# Build tests ...
 if (protobuf_BUILD_TESTS)
    include_directories(${protobuf_BINARY_DIR})
 
-if(WIN32)
-   set(protoc_WORKING_DIR ${protobuf_BINARY_DIR}/Debug)
-else()
-   set(protoc_WORKING_DIR ${protobuf_BINARY_DIR})
-endif()
+   # CMake puts the binaries in different places
+   if(WIN32)
+      set(protoc_WORKING_DIR ${protobuf_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+   else()
+      set(protoc_WORKING_DIR ${protobuf_BINARY_DIR})
+   endif()
    # Define protobuf_lite source files
    set (protobuf_lite_test_SRCS
       src/google/protobuf
@@ -380,6 +390,4 @@ endif()
    add_executable(protobuf_lite_test ${protobuf_lite_test_SRCS})
    target_link_libraries(protobuf_lite_test libprotobuf_lite)
 endif()
-
-# Tests
 
