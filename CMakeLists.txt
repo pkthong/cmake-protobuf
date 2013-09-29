@@ -18,8 +18,8 @@ PROJECT(protobuf C CXX)
 
 cmake_minimum_required(VERSION 2.8)
 
-find_package(Threads QUIET)
-include_directories(src src/google/protobuf)
+find_package(Threads REQUIRED)
+include_directories(src src/google/protobuf ${CMAKE_CURRENT_BINARY_DIR})
 
 set(protobuf_COMMON_SRCS
    src/google/protobuf/stubs/atomicops.h
@@ -240,7 +240,7 @@ if(WIN32)
    ADD_COMPILER_FLAGS("-wd4244 -wd4996 -D_WIN32 -DLIBPROTOBUF_EXPORTS -D_CRT_SECURE_NO_WARNINGS" CACHE)
 else()
     # POSIX common
-   ADD_COMPILER_FLAGS("-_GNU_SOURCE" CACHE)
+   ADD_COMPILER_FLAGS("-D_GNU_SOURCE" CACHE)
    check_library_exists("c" ftruncate "" HAVE_FTRUNCATE)
    check_library_exists("c" memset "" HAVE_MEMSET)
    check_library_exists("c" mkdir "" HAVE_MKDIR)
@@ -287,6 +287,7 @@ else()
          endforeach(hashMapLocation)
       endforeach(hashMapName)
    endif()
+   set(HAVE_HASH_MAP)
    if (NOT hashSetFound)
       foreach(hashSetName hash_set unordered_set)
          foreach(hashSetLocation "<${hashSetName}>" "<tr1/${hashSetName}>)")
@@ -297,7 +298,7 @@ else()
                      int main(int argc, char * argv[]) 
                      { 
                         const ${hashSetNamespace}::${hashSetName}<int> t;
-                        return t.find(4);
+                        return 0;
                      }")
                   CHECK_CXX_SOURCE_COMPILES("${hashSetTest}" HAVE_HASH_SET)
                   if(HAVE_HASH_SET)
@@ -312,9 +313,14 @@ else()
          endforeach(hashSetLocation)
       endforeach(hashSetName)
    endif()
+   set(HAVE_HASH_SET)
    # END TODO
 
+   if(Threads_FOUND)
+      set(HAVE_PTHREAD 1)
+   endif()
    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+   ADD_COMPILER_FLAGS("-DHAVE_CONFIG_H" CACHE)
 endif()
 
 add_library(libprotoc ${libprotoc_SRCS})

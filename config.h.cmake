@@ -12,7 +12,7 @@
 #cmakedefine HASH_NAMESPACE ${HASH_NAMESPACE}
 
 /* the name of <hash_set> */
-#cmakedefine HASH_SET_CLASS ${HASH_SET}
+#cmakedefine HASH_SET_CLASS ${HASH_SET_CLASS}
 
 /* the location of <unordered_set> or <hash_set> */
 #cmakedefine HASH_SET_H ${HASH_SET_H}
@@ -48,7 +48,7 @@
 #cmakedefine HAVE_MKDIR 1
 
 /* Define if you have POSIX threads libraries and header files. */
-#cmakedefine HAVE_PTHREAD 1
+#cmakedefine HAVE_PTHREAD ${CMAKE_HAVE_THREADS_LIBRARY}
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine HAVE_STDINT_H 1
@@ -116,25 +116,25 @@
 #cmakedefine STDC_HEADERS 1
 
 /* Enable extensions on AIX 3, Interix.  */
-#ifndef _ALL_SOURCE
-# define _ALL_SOURCE
-#endif
+//#ifndef _ALL_SOURCE
+//# define _ALL_SOURCE
+//#endif
 /* Enable GNU extensions on systems that have them.  */
 #ifndef _GNU_SOURCE
 # define _GNU_SOURCE
 #endif
 /* Enable threading extensions on Solaris.  */
-#ifndef _POSIX_PTHREAD_SEMANTICS
-# define _POSIX_PTHREAD_SEMANTICS
-#endif
+//#ifndef _POSIX_PTHREAD_SEMANTICS
+//# define _POSIX_PTHREAD_SEMANTICS
+//#endif
 /* Enable extensions on HP NonStop.  */
-#ifndef _TANDEM_SOURCE
-# define _TANDEM_SOURCE
-#endif
+//#ifndef _TANDEM_SOURCE
+//# define _TANDEM_SOURCE
+//#endif
 /* Enable general extensions on Solaris.  */
-#ifndef __EXTENSIONS__
-# define __EXTENSIONS__
-#endif
+//#ifndef __EXTENSIONS__
+//# define __EXTENSIONS__
+//#endif
 
 
 /* Version number of package */
