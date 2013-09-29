@@ -82,7 +82,7 @@ void EnumGenerator::Generate(io::Printer* printer) {
   }
   printer->Indent();
 
-  for (int i = 0; i < canonical_values_.size(); i++) {
+  for (size_t i = 0; i < canonical_values_.size(); i++) {
     map<string, string> vars;
     vars["name"] = canonical_values_[i]->name();
     vars["index"] = SimpleItoa(canonical_values_[i]->index());
@@ -98,7 +98,7 @@ void EnumGenerator::Generate(io::Printer* printer) {
 
   // -----------------------------------------------------------------
 
-  for (int i = 0; i < aliases_.size(); i++) {
+  for (size_t i = 0; i < aliases_.size(); i++) {
     map<string, string> vars;
     vars["classname"] = descriptor_->name();
     vars["name"] = aliases_[i].value->name();
@@ -130,7 +130,7 @@ void EnumGenerator::Generate(io::Printer* printer) {
   printer->Indent();
   printer->Indent();
 
-  for (int i = 0; i < canonical_values_.size(); i++) {
+  for (size_t i = 0; i < canonical_values_.size(); i++) {
     printer->Print(
       "case $number$: return $name$;\n",
       "name", canonical_values_[i]->name(),

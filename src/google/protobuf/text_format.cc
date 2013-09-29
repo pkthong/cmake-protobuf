@@ -1179,7 +1179,7 @@ void TextFormat::Printer::Print(const Message& message,
   const Reflection* reflection = message.GetReflection();
   vector<const FieldDescriptor*> fields;
   reflection->ListFields(message, &fields);
-  for (int i = 0; i < fields.size(); i++) {
+  for (size_t i = 0; i < fields.size(); i++) {
     PrintField(message, reflection, fields[i], generator);
   }
   PrintUnknownFields(reflection->GetUnknownFields(message), generator);

@@ -545,7 +545,7 @@ void FileGenerator::GenerateBuildDescriptors(io::Printer* printer) {
     vector<string> dependency_package_parts;
     SplitStringUsing(dependency->package(), ".", &dependency_package_parts);
     printer->Print("::");
-    for (int j = 0; j < dependency_package_parts.size(); j++) {
+    for (size_t j = 0; j < dependency_package_parts.size(); j++) {
       printer->Print("$name$::",
                      "name", dependency_package_parts[j]);
     }
@@ -569,7 +569,7 @@ void FileGenerator::GenerateBuildDescriptors(io::Printer* printer) {
 
     // Only write 40 bytes per line.
     static const int kBytesPerLine = 40;
-    for (int i = 0; i < file_data.size(); i += kBytesPerLine) {
+    for (size_t i = 0; i < file_data.size(); i += kBytesPerLine) {
       printer->Print("\n  \"$data$\"",
                      "data",
                      EscapeTrigraphs(
@@ -631,7 +631,7 @@ void FileGenerator::GenerateBuildDescriptors(io::Printer* printer) {
 void FileGenerator::GenerateNamespaceOpeners(io::Printer* printer) {
   if (package_parts_.size() > 0) printer->Print("\n");
 
-  for (int i = 0; i < package_parts_.size(); i++) {
+  for (size_t i = 0; i < package_parts_.size(); i++) {
     printer->Print("namespace $part$ {\n",
                    "part", package_parts_[i]);
   }

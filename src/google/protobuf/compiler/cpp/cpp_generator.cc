@@ -80,7 +80,7 @@ bool CppGenerator::Generate(const FileDescriptor* file,
   // __declspec(dllimport) depending on what is being compiled.
   Options file_options;
 
-  for (int i = 0; i < options.size(); i++) {
+  for (size_t i = 0; i < options.size(); i++) {
     if (options[i].first == "dllexport_decl") {
       file_options.dllexport_decl = options[i].second;
     } else if (options[i].first == "safe_boundary_check") {

@@ -85,7 +85,7 @@ hash_set<string> kKeywords = MakeKeywordsMap();
 string UnderscoresToCamelCase(const string& input, bool cap_next_letter) {
   string result;
   // Note:  I distrust ctype.h due to locales.
-  for (int i = 0; i < input.size(); i++) {
+  for (size_t i = 0; i < input.size(); i++) {
     if ('a' <= input[i] && input[i] <= 'z') {
       if (cap_next_letter) {
         result += input[i] + ('A' - 'a');
@@ -337,7 +337,7 @@ string DefaultValue(const FieldDescriptor* field) {
 // Convert a file name into a valid identifier.
 string FilenameIdentifier(const string& filename) {
   string result;
-  for (int i = 0; i < filename.size(); i++) {
+  for (size_t i = 0; i < filename.size(); i++) {
     if (ascii_isalnum(filename[i])) {
       result.push_back(filename[i]);
     } else {

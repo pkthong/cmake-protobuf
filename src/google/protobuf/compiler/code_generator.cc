@@ -61,7 +61,7 @@ void ParseGeneratorParameter(const string& text,
   vector<string> parts;
   SplitStringUsing(text, ",", &parts);
 
-  for (int i = 0; i < parts.size(); i++) {
+  for (size_t i = 0; i < parts.size(); i++) {
     string::size_type equals_pos = parts[i].find_first_of('=');
     pair<string, string> value;
     if (equals_pos == string::npos) {

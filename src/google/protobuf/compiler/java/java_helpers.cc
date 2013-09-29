@@ -68,7 +68,7 @@ const string& FieldName(const FieldDescriptor* field) {
 string UnderscoresToCamelCaseImpl(const string& input, bool cap_next_letter) {
   string result;
   // Note:  I distrust ctype.h due to locales.
-  for (int i = 0; i < input.size(); i++) {
+  for (size_t i = 0; i < input.size(); i++) {
     if ('a' <= input[i] && input[i] <= 'z') {
       if (cap_next_letter) {
         result += input[i] + ('A' - 'a');
@@ -273,7 +273,7 @@ const char* BoxedPrimitiveTypeName(JavaType type) {
 }
 
 bool AllAscii(const string& text) {
-  for (int i = 0; i < text.size(); i++) {
+  for (size_t i = 0; i < text.size(); i++) {
     if ((text[i] & 0x80) != 0) {
       return false;
     }

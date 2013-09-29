@@ -126,7 +126,7 @@ static void WriteDocCommentBodyForLocation(
     printer->Print(
         " *\n"
         " * <pre>\n");
-    for (int i = 0; i < lines.size(); i++) {
+    for (size_t i = 0; i < lines.size(); i++) {
       // Most lines should start with a space.  Watch out for lines that start
       // with a /, since putting that right after the leading asterisk will
       // close the comment.

@@ -163,7 +163,7 @@ bool TryCreateParentDirectory(const string& prefix, const string& filename) {
   vector<string> parts;
   SplitStringUsing(filename, "/", &parts);
   string path_so_far = prefix;
-  for (int i = 0; i < parts.size() - 1; i++) {
+  for (size_t i = 0; i < parts.size() - 1; i++) {
     path_so_far += parts[i];
     if (mkdir(path_so_far.c_str(), 0777) != 0) {
       if (errno != EEXIST) {
@@ -530,7 +530,7 @@ CommandLineInterface::MemoryOutputStream::~MemoryOutputStream() {
     } else {
       // Calculate how much space we need.
       int indent_size = 0;
-      for (int i = 0; i < data_.size(); i++) {
+      for (size_t i = 0; i < data_.size(); i++) {
         if (data_[i] == '\n') indent_size += indent_.size();
       }
 
@@ -612,7 +612,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
 
   // Set up the source tree.
   DiskSourceTree source_tree;
-  for (int i = 0; i < proto_path_.size(); i++) {
+  for (size_t i = 0; i < proto_path_.size(); i++) {
     source_tree.MapPath(proto_path_[i].first, proto_path_[i].second);
   }
 
@@ -630,7 +630,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
   vector<const FileDescriptor*> parsed_files;
 
   // Parse each file.
-  for (int i = 0; i < input_files_.size(); i++) {
+  for (size_t i = 0; i < input_files_.size(); i++) {
     // Import the file.
     const FileDescriptor* parsed_file = importer.Import(input_files_[i]);
     if (parsed_file == NULL) return 1;
@@ -652,7 +652,7 @@ int CommandLineInterface::Run(int argc, const char* const argv[]) {
 
   // Generate output.
   if (mode_ == MODE_COMPILE) {
-    for (int i = 0; i < output_directives_.size(); i++) {
+    for (size_t i = 0; i < output_directives_.size(); i++) {
       string output_location = output_directives_[i].output_location;
       if (!HasSuffixString(output_location, ".zip") &&
           !HasSuffixString(output_location, ".jar")) {
@@ -742,7 +742,7 @@ void CommandLineInterface::Clear() {
 
 bool CommandLineInterface::MakeInputsBeProtoPathRelative(
     DiskSourceTree* source_tree) {
-  for (int i = 0; i < input_files_.size(); i++) {
+  for (size_t i = 0; i < input_files_.size(); i++) {
     string virtual_file, shadowing_disk_file;
     switch (source_tree->DiskFileToVirtualFile(
         input_files_[i], &virtual_file, &shadowing_disk_file)) {
@@ -922,7 +922,7 @@ CommandLineInterface::InterpretArgument(const string& name,
     vector<string> parts;
     SplitStringUsing(value, kPathSeparator, &parts);
 
-    for (int i = 0; i < parts.size(); i++) {
+    for (size_t i = 0; i < parts.size(); i++) {
       string virtual_path;
       string disk_path;
 
@@ -1206,7 +1206,7 @@ bool CommandLineInterface::GenerateOutput(
       }
       parameters.append(generator_parameters_[output_directive.name]);
     }
-    for (int i = 0; i < parsed_files.size(); i++) {
+    for (size_t i = 0; i < parsed_files.size(); i++) {
       if (!output_directive.generator->Generate(parsed_files[i], parameters,
                                                 generator_context, &error)) {
         // Generator returned an error.
@@ -1235,7 +1235,7 @@ bool CommandLineInterface::GeneratePluginOutput(
   }
 
   set<const FileDescriptor*> already_seen;
-  for (int i = 0; i < parsed_files.size(); i++) {
+  for (size_t i = 0; i < parsed_files.size(); i++) {
     request.add_file_to_generate(parsed_files[i]->name());
     GetTransitiveDependencies(parsed_files[i],
                               true,  // Include source code info.
@@ -1368,13 +1368,13 @@ bool CommandLineInterface::WriteDescriptorSet(
 
   if (imports_in_descriptor_set_) {
     set<const FileDescriptor*> already_seen;
-    for (int i = 0; i < parsed_files.size(); i++) {
+    for (size_t i = 0; i < parsed_files.size(); i++) {
       GetTransitiveDependencies(parsed_files[i],
                                 source_info_in_descriptor_set_,
                                 &already_seen, file_set.mutable_file());
     }
   } else {
-    for (int i = 0; i < parsed_files.size(); i++) {
+    for (size_t i = 0; i < parsed_files.size(); i++) {
       FileDescriptorProto* file_proto = file_set.add_file();
       parsed_files[i]->CopyTo(file_proto);
       if (source_info_in_descriptor_set_) {

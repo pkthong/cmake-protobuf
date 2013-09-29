@@ -68,7 +68,7 @@ bool CollectExtensions(const Message& message,
   vector<const FieldDescriptor*> fields;
   reflection->ListFields(message, &fields);
 
-  for (int i = 0; i < fields.size(); i++) {
+  for (size_t i = 0; i < fields.size(); i++) {
     if (fields[i]->is_extension()) extensions->push_back(fields[i]);
 
     if (GetJavaType(fields[i]) == JAVATYPE_MESSAGE) {
@@ -309,7 +309,7 @@ void FileGenerator::GenerateEmbeddedDescriptor(io::Printer* printer) {
 
   // Only write 40 bytes per line.
   static const int kBytesPerLine = 40;
-  for (int i = 0; i < file_data.size(); i += kBytesPerLine) {
+  for (size_t i = 0; i < file_data.size(); i += kBytesPerLine) {
     if (i > 0) {
       // Every 400 lines, start a new string literal, in order to avoid the
       // 64k length limit.
@@ -377,7 +377,7 @@ void FileGenerator::GenerateEmbeddedDescriptor(io::Printer* printer) {
     printer->Print(
       "com.google.protobuf.ExtensionRegistry registry =\n"
       "  com.google.protobuf.ExtensionRegistry.newInstance();\n");
-    for (int i = 0; i < extensions.size(); i++) {
+    for (size_t i = 0; i < extensions.size(); i++) {
       ExtensionGenerator(extensions[i]).GenerateRegistrationCode(printer);
     }
     printer->Print(

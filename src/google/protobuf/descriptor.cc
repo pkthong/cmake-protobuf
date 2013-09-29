@@ -146,7 +146,7 @@ string ToCamelCase(const string& input) {
   string result;
   result.reserve(input.size());
 
-  for (int i = 0; i < input.size(); i++) {
+  for (size_t i = 0; i < input.size(); i++) {
     if (input[i] == '_') {
       capitalize_next = true;
     } else if (capitalize_next) {
@@ -552,7 +552,7 @@ DescriptorPool::Tables::~Tables() {
   // Note that the deletion order is important, since the destructors of some
   // messages may refer to objects in allocations_.
   STLDeleteElements(&messages_);
-  for (int i = 0; i < allocations_.size(); i++) {
+  for (size_t i = 0; i < allocations_.size(); i++) {
     operator delete(allocations_[i]);
   }
   STLDeleteElements(&strings_);
@@ -592,17 +592,17 @@ void DescriptorPool::Tables::RollbackToLastCheckpoint() {
   GOOGLE_DCHECK(!checkpoints_.empty());
   const CheckPoint& checkpoint = checkpoints_.back();
 
-  for (int i = checkpoint.pending_symbols_before_checkpoint;
+  for (size_t i = checkpoint.pending_symbols_before_checkpoint;
        i < symbols_after_checkpoint_.size();
        i++) {
     symbols_by_name_.erase(symbols_after_checkpoint_[i]);
   }
-  for (int i = checkpoint.pending_files_before_checkpoint;
+  for (size_t i = checkpoint.pending_files_before_checkpoint;
        i < files_after_checkpoint_.size();
        i++) {
     files_by_name_.erase(files_after_checkpoint_[i]);
   }
-  for (int i = checkpoint.pending_extensions_before_checkpoint;
+  for (size_t i = checkpoint.pending_extensions_before_checkpoint;
        i < extensions_after_checkpoint_.size();
        i++) {
     extensions_.erase(extensions_after_checkpoint_[i]);
@@ -622,7 +622,7 @@ void DescriptorPool::Tables::RollbackToLastCheckpoint() {
   STLDeleteContainerPointers(
       file_tables_.begin() + checkpoint.file_tables_before_checkpoint,
       file_tables_.end());
-  for (int i = checkpoint.allocations_before_checkpoint;
+  for (size_t i = checkpoint.allocations_before_checkpoint;
        i < allocations_.size();
        i++) {
     operator delete(allocations_[i]);
@@ -1077,7 +1077,7 @@ void DescriptorPool::FindAllExtensions(
     vector<int> numbers;
     if (fallback_database_->FindAllExtensionNumbers(extendee->full_name(),
                                                     &numbers)) {
-      for (int i = 0; i < numbers.size(); ++i) {
+      for (size_t i = 0; i < numbers.size(); ++i) {
         int number = numbers[i];
         if (tables_->FindExtension(extendee, number) == NULL) {
           TryFindExtensionInFallbackDatabase(extendee, number);
@@ -1641,7 +1641,7 @@ bool RetrieveOptions(int depth,
   const Reflection* reflection = options.GetReflection();
   vector<const FieldDescriptor*> fields;
   reflection->ListFields(options, &fields);
-  for (int i = 0; i < fields.size(); i++) {
+  for (size_t i = 0; i < fields.size(); i++) {
     int count = 1;
     bool repeated = false;
     if (fields[i]->is_repeated()) {
@@ -1691,7 +1691,7 @@ bool FormatLineOptions(int depth, const Message &options, string *output) {
   string prefix(depth * 2, ' ');
   vector<string> all_options;
   if (RetrieveOptions(depth, options, &all_options)) {
-    for (int i = 0; i < all_options.size(); i++) {
+    for (size_t i = 0; i < all_options.size(); i++) {
       strings::SubstituteAndAppend(output, "$0option $1;\n",
                                    prefix, all_options[i]);
     }
@@ -1988,7 +1988,7 @@ void MethodDescriptor::DebugString(int depth, string *contents) const {
 
 static bool PathsEqual(const vector<int>& x, const RepeatedField<int32>& y) {
   if (x.size() != y.size()) return false;
-  for (int i = 0; i < x.size(); ++i) {
+  for (size_t i = 0; i < x.size(); ++i) {
     if (x[i] != y.Get(i)) return false;
   }
   return true;
@@ -2923,7 +2923,7 @@ void DescriptorBuilder::ValidateSymbolName(
     AddError(full_name, proto, DescriptorPool::ErrorCollector::NAME,
              "Missing name.");
   } else {
-    for (int i = 0; i < name.size(); i++) {
+    for (size_t i = 0; i < name.size(); i++) {
       // I don't trust isalnum() due to locales.  :(
       if ((name[i] < 'a' || 'z' < name[i]) &&
           (name[i] < 'A' || 'Z' < name[i]) &&
@@ -2939,7 +2939,7 @@ void DescriptorBuilder::ValidateSymbolName(
 bool DescriptorBuilder::ValidateQualifiedName(const string& name) {
   bool last_was_period = false;
 
-  for (int i = 0; i < name.size(); i++) {
+  for (size_t i = 0; i < name.size(); i++) {
     // I don't trust isalnum() due to locales.  :(
     if (('a' <= name[i] && name[i] <= 'z') ||
         ('A' <= name[i] && name[i] <= 'Z') ||
@@ -3048,7 +3048,7 @@ const FileDescriptor* DescriptorBuilder::BuildFile(
   //   mid-file, but that's pretty ugly, and I'm pretty sure there are
   //   some languages out there that do not allow recursive dependencies
   //   at all.
-  for (int i = 0; i < tables_->pending_files_.size(); i++) {
+  for (size_t i = 0; i < tables_->pending_files_.size(); i++) {
     if (tables_->pending_files_[i] == proto.name()) {
       string error_message("File recursively imports itself: ");
       for (; i < tables_->pending_files_.size(); i++) {

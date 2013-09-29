@@ -525,7 +525,9 @@ GenerateMessageSerializationMethods(io::Printer* printer) {
   }
 
   // Merge the fields and the extension ranges, both sorted by field number.
-  for (int i = 0, j = 0;
+  int i = 0;
+  size_t j = 0;
+  for (;
        i < descriptor_->field_count() || j < sorted_extensions.size();
        ) {
     if (i == descriptor_->field_count()) {

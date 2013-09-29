@@ -362,7 +362,7 @@ void Generator::PrintTopLevelEnums() const {
     }
   }
 
-  for (int i = 0; i < top_level_enum_values.size(); ++i) {
+  for (size_t i = 0; i < top_level_enum_values.size(); ++i) {
     printer_->Print("$name$ = $value$\n",
                     "name", top_level_enum_values[i].first,
                     "value", SimpleItoa(top_level_enum_values[i].second));
