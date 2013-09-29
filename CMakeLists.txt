@@ -287,9 +287,6 @@ else()
          endforeach(hashMapLocation)
       endforeach(hashMapName)
    endif()
-   if (NOT hashMapFound)
-      set(HAVE_HASH_MAP FALSE)
-   endif()
    if (NOT hashSetFound)
       foreach(hashSetName hash_set unordered_set)
          foreach(hashSetLocation "<${hashSetName}>" "<tr1/${hashSetName}>")
@@ -314,9 +311,6 @@ else()
             endforeach(hashSetNamespace)
          endforeach(hashSetLocation)
       endforeach(hashSetName)
-   endif()
-   if (NOT hashSetFound)
-      set(HAVE_HASH_SET FALSE)
    endif()
    # END TODO
 
@@ -348,6 +342,12 @@ endif()
 
 if (protobuf_BUILD_TESTS)
    include_directories(${protobuf_BINARY_DIR})
+
+if(WIN32)
+   set(protoc_WORKING_DIR ${protobuf_BINARY_DIR}/Debug)
+else()
+   set(protoc_WORKING_DIR ${protobuf_BINARY_DIR})
+endif()
    # Define protobuf_lite source files
    set (protobuf_lite_test_SRCS
       src/google/protobuf
@@ -361,20 +361,20 @@ if (protobuf_BUILD_TESTS)
       OUTPUT ${protobuf_BINARY_DIR}/google/protobuf/unittest_import_lite.pb.cc
       COMMAND protoc -I${protobuf_SOURCE_DIR}/src --cpp_out=${protobuf_BINARY_DIR} ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_lite.proto
       DEPENDS protoc ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_lite.proto
-      WORKING_DIRECTORY ${protobuf_BINARY_DIR}/Debug
+      WORKING_DIRECTORY ${protobuf_WORKING_DIR}
       )
 
    ADD_CUSTOM_COMMAND(
       OUTPUT ${protobuf_BINARY_DIR}/google/protobuf/unittest_import_public_lite.pb.cc
       COMMAND protoc -I${protobuf_SOURCE_DIR}/src --cpp_out=${protobuf_BINARY_DIR} ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_public_lite.proto
       DEPENDS protoc ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_import_public_lite.proto
-      WORKING_DIRECTORY ${protobuf_BINARY_DIR}/Debug
+      WORKING_DIRECTORY ${protobuf_WORKING_DIR}
       )
    ADD_CUSTOM_COMMAND(
       OUTPUT ${protobuf_BINARY_DIR}/google/protobuf/unittest_lite.pb.cc
       COMMAND protoc -I${protobuf_SOURCE_DIR}/src --cpp_out=${protobuf_BINARY_DIR} ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_lite.proto
       DEPENDS protoc ${protobuf_SOURCE_DIR}/src/google/protobuf/unittest_lite.proto
-      WORKING_DIRECTORY ${protobuf_BINARY_DIR}/Debug
+      WORKING_DIRECTORY ${protobuf_WORKING_DIR}
       )
 
    add_executable(protobuf_lite_test ${protobuf_lite_test_SRCS})
