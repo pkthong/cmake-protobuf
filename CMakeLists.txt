@@ -2,12 +2,23 @@ option(protobuf_BUILD_SHARED_LIBS "Build Protobuf as Shared Library" OFF)
 option(protobuf_BUILD_TESTS "Build Protobuf Tests" ON)
 
 # Useful CMake helper functions
+#set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake;${CMAKE_MODULE_PATH}")
 include(cmake/FlagUtilities.cmake)
+include (CheckFunctionExists)
+include (CheckIncludeFile)
+include (CheckIncludeFiles)
+include (CheckLibraryExists)
+include (CheckSymbolExists)
+include (CheckTypeSize)
+include (CheckCXXSourceCompiles)
+include (CheckCSourceCompiles)
 
+# Protocol Buffers with CMake   
 PROJECT(protobuf C CXX)
 
 cmake_minimum_required(VERSION 2.8)
 
+find_package(Threads QUIET)
 include_directories(src src/google/protobuf)
 
 set(protobuf_COMMON_SRCS
@@ -227,56 +238,83 @@ if(WIN32)
    include_directories(vsprojects)
    #   add_definitions(-D_WIN32 -DLIBPROTOBUF_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
    ADD_COMPILER_FLAGS("-wd4244 -wd4996 -D_WIN32 -DLIBPROTOBUF_EXPORTS -D_CRT_SECURE_NO_WARNINGS" CACHE)
-#    set(UV_SRCS ${UV_WIN32_SRCS} ${UV_COMMON_SRCS})
-#    set(UV_TESTRUNNER_SRCS test/runner-win.c test/runner-win.h)
-#    set(UV_LIBS ws2_32 psapi iphlpapi)
 else()
     # POSIX common
-#    include_directories(src/unix/ev)
-#    add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -DEIO_STACKSIZE=262144)
-#    set(UV_TESTRUNNER_SRCS test/runner-unix.c test/runner-unix.h)
-#
-#    # OS specific thingy
-#    # FIXME: solaris here
-#    if(APPLE)
-#        add_definitions(
-#            -D_DARWIN_USE_64_BIT_INODE=1)
-#        set(UV_SRCS
-#            ${UV_POSIX_SRCS}
-#            ${UV_COMMON_SRCS}
-#            src/unix/darwin.c
-#            src/unix/fsevents.c
-#            src/unix/kqueue.c)
-#        set(UV_LIBS m)
-#    elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-#        set(UV_SRCS
-#            ${UV_POSIX_SRCS}
-#            ${UV_COMMON_SRCS}
-#            src/unix/linux/linux-core.c
-#            src/unix/linux/inotify.c
-#            src/unix/linux/syscalls.c
-#            src/unix/linux/syscalls.h
-#            )
-#        set(UV_LIBS rt m dl)
-#    elseif(${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
-#        set(UV_SRCS
-#            ${UV_POSIX_SRCS}
-#            ${UV_COMMON_SRCS}
-#            src/unix/freebsd.c
-#            src/unix/kqueue.c
-#            )
-#        set(UV_LIBS m pthread kvm)
-#    elseif(${CMAKE_SYSTEM_NAME} STREQUAL "CYGWIN")
-#        set(UV_SRCS
-#            ${UV_POSIX_SRCS}
-#            ${UV_COMMON_SRCS}
-#            src/unix/cygwin.c
-#            )
-#        set(UV_LIBS rt m dl)
-#    else()
-#        message(FATAL_ERROR
-#            "We don't support this system for now: ${CMAKE_SYSTEM_NAME}")
-#    endif()
+   ADD_COMPILER_FLAGS("-_GNU_SOURCE" CACHE)
+   check_library_exists("c" ftruncate "" HAVE_FTRUNCATE)
+   check_library_exists("c" memset "" HAVE_MEMSET)
+   check_library_exists("c" mkdir "" HAVE_MKDIR)
+   check_library_exists("c" strchr "" HAVE_STRCHR)
+   check_library_exists("c" strtol "" HAVE_STRTOL)
+   CHECK_INCLUDE_FILES(dlfcn.h HAVE_DLFCN_H)
+   CHECK_INCLUDE_FILES(fcntl.h HAVE_FCNTL_H)
+   CHECK_INCLUDE_FILES(inttypes.h HAVE_INTTYPES_H)
+   CHECK_INCLUDE_FILES(limits.h HAVE_LIMITS_H)
+   CHECK_INCLUDE_FILES(stdlib.h HAVE_STDLIB_H)
+   CHECK_INCLUDE_FILES(stdint.h HAVE_STDINT_H)
+   CHECK_INCLUDE_FILES(unistd.h HAVE_UNISTD_H)
+   CHECK_INCLUDE_FILES(memory.h HAVE_MEMORY_H)
+   CHECK_INCLUDE_FILES(strings.h HAVE_STRINGS_H)
+   CHECK_INCLUDE_FILES(string.h HAVE_STRING_H)
+   CHECK_INCLUDE_FILES("stdlib.h;stdarg.h;float.h;string.h" STDC_HEADERS)
+   CHECK_INCLUDE_FILES("sys/stat.h" HAVE_SYS_STAT_H)
+   CHECK_INCLUDE_FILES("sys/types.h" HAVE_SYS_TYPES_H)
+
+   # TODO Move to separate cmake file
+   if (NOT hashMapFound)
+      foreach(hashMapName hash_map unordered_map)
+         foreach(hashMapLocation "<${hashMapName}>" "<tr1/${hashMapName}>")
+            foreach(hashMapNamespace std std::tr1 stdext)
+               if (NOT hashMapFound)
+                  set( hashMapTest "
+                     #include ${hashMapLocation}
+                     int main(int argc, char * argv[]) 
+                     { 
+                        const ${hashMapNamespace}::${hashMapName}<int, int> t;
+                        return t.find(4) == t.end();
+                     }")
+                  CHECK_CXX_SOURCE_COMPILES("${hashMapTest}" HAVE_HASH_MAP)
+                  if(HAVE_HASH_MAP)
+                     set(HASH_MAP_H ${hashMapLocation})
+                     set(HASH_NAMESPACE ${hashMapNamespace})
+                     set(HASH_MAP_CLASS ${hashMapName})
+                     set(hashMapFound 1)
+                  else()
+                     unset(HAVE_HASH_MAP CACHE)
+                  endif()
+               endif()
+            endforeach(hashMapNamespace)
+         endforeach(hashMapLocation)
+      endforeach(hashMapName)
+   endif()
+   if (NOT hashSetFound)
+      foreach(hashSetName hash_set unordered_set)
+         foreach(hashSetLocation "<${hashSetName}>" "<tr1/${hashSetName}>)")
+            foreach(hashSetNamespace std std::tr1 stdext)
+               if (NOT hashSetFound)
+                  set( hashSetTest "
+                     #include ${hashSetLocation}
+                     int main(int argc, char * argv[]) 
+                     { 
+                        const ${hashSetNamespace}::${hashSetName}<int> t;
+                        return t.find(4);
+                     }")
+                  CHECK_CXX_SOURCE_COMPILES("${hashSetTest}" HAVE_HASH_SET)
+                  if(HAVE_HASH_SET)
+                     set(HASH_SET_H ${hashSetLocation})
+                     set(HASH_SET_CLASS ${hashSetName})
+                     set(hashSetFound 1)
+                  else()
+                     unset(HAVE_HASH_SET CACHE)
+                  endif()
+               endif()
+            endforeach(hashSetNamespace)
+         endforeach(hashSetLocation)
+      endforeach(hashSetName)
+   endif()
+   # END TODO
+
+   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 endif()
 
 add_library(libprotoc ${libprotoc_SRCS})
