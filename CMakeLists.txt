@@ -1,5 +1,5 @@
 option(protobuf_BUILD_SHARED_LIBS "Build Protobuf as Shared Library" OFF)
-option(protobuf_BUILD_TESTS "Build Protobuf Tests" ON)
+option(protobuf_BUILD_TESTS "Build Protobuf Tests" OFF)
 
 # Useful CMake helper functions
 include(cmake/FlagUtilities.cmake)
@@ -360,7 +360,6 @@ if (protobuf_BUILD_TESTS)
    endif()
    # Define protobuf_lite source files
    set (protobuf_lite_test_SRCS
-      src/google/protobuf
       src/google/protobuf/lite_unittest.cc
       src/google/protobuf/test_util_lite.cc
       ${protobuf_BINARY_DIR}/google/protobuf/unittest_import_lite.pb.cc
