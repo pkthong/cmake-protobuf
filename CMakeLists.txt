@@ -4,14 +4,14 @@ option(protobuf_USE_EXECPTIONS "Protocol Buffer - Use C++ Exceptions" OFF)
 
 # Useful CMake helper functions
 include(cmake/FlagUtilities.cmake)
-include (CheckFunctionExists)
-include (CheckIncludeFile)
-include (CheckIncludeFiles)
-include (CheckLibraryExists)
-include (CheckSymbolExists)
-include (CheckTypeSize)
-include (CheckCXXSourceCompiles)
-include (CheckCSourceCompiles)
+include(CheckFunctionExists)
+include(CheckIncludeFile)
+include(CheckIncludeFiles)
+include(CheckLibraryExists)
+include(CheckSymbolExists)
+include(CheckTypeSize)
+include(CheckCXXSourceCompiles)
+include(CheckCSourceCompiles)
 
 # Protocol Buffers with CMake
 PROJECT(protobuf C CXX)
