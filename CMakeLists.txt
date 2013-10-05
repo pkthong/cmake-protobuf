@@ -1,5 +1,6 @@
 option(protobuf_BUILD_SHARED_LIBS "Build Protobuf as Shared Library" OFF)
 option(protobuf_BUILD_TESTS "Build Protobuf Tests" OFF)
+option(protobuf_USE_Cpp11 "Use C++ 11" OFF)
 option(protobuf_USE_EXECPTIONS "Protocol Buffer - Use C++ Exceptions" OFF)
 
 # Useful CMake helper functions
@@ -242,14 +243,18 @@ else()
     # POSIX common
    ADD_COMPILER_FLAGS("-D_GNU_SOURCE" CACHE)
    find_package(Threads REQUIRED)
+   message(STATUS "CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
+   if (protobuf_USE_Cpp11)
+      ADD_COMPILER_FLAGS("-std=c++11 -stdlib=libc++" "CXX" CACHE)
+   endif()
 endif()
 
 # Check for OS support ..
-check_library_exists("c" ftruncate "" HAVE_FTRUNCATE)
-check_library_exists("c" memset "" HAVE_MEMSET)
-check_library_exists("c" mkdir "" HAVE_MKDIR)
-check_library_exists("c" strchr "" HAVE_STRCHR)
-check_library_exists("c" strtol "" HAVE_STRTOL)
+check_function_exists(ftruncate HAVE_FTRUNCATE)
+check_function_exists(memset HAVE_MEMSET)
+check_function_exists(mkdir HAVE_MKDIR)
+check_function_exists(strchr HAVE_STRCHR)
+check_function_exists(strtol HAVE_STRTOL)
 CHECK_INCLUDE_FILES(dlfcn.h HAVE_DLFCN_H)
 CHECK_INCLUDE_FILES(fcntl.h HAVE_FCNTL_H)
 CHECK_INCLUDE_FILES(inttypes.h HAVE_INTTYPES_H)
