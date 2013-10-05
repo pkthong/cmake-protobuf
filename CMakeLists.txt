@@ -1,5 +1,6 @@
 option(protobuf_BUILD_SHARED_LIBS "Build Protobuf as Shared Library" OFF)
 option(protobuf_BUILD_TESTS "Build Protobuf Tests" OFF)
+option(protobuf_USE_EXECPTIONS "Protocol Buffer - Use C++ Exceptions" OFF)
 
 # Useful CMake helper functions
 include(cmake/FlagUtilities.cmake)
@@ -321,6 +322,12 @@ endif()
 if(Threads_FOUND)
    set(HAVE_PTHREAD 1)
 endif()
+if (protobuf_USE_EXCEPTIONS)
+   set (PROTOBUF_USE_EXCEPTIONS 1)
+else ()
+   set (PROTOBUF_USE_EXCEPTIONS 0)
+endif()
+
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 ADD_COMPILER_FLAGS("-DHAVE_CONFIG_H" CACHE)
 
