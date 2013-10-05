@@ -1,5 +1,6 @@
 option(protobuf_BUILD_SHARED_LIBS "Build Protobuf as Shared Library" OFF)
 option(protobuf_BUILD_TESTS "Build Protobuf Tests" OFF)
+option(protobuf_USE_Cpp11 "Use C++ 11" OFF)
 
 # Useful CMake helper functions
 include(cmake/FlagUtilities.cmake)
@@ -241,6 +242,10 @@ else()
     # POSIX common
    ADD_COMPILER_FLAGS("-D_GNU_SOURCE" CACHE)
    find_package(Threads REQUIRED)
+   message(STATUS "CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS}")
+   if (protobuf_USE_Cpp11)
+      ADD_COMPILER_FLAGS("-std=c++11 -stdlib=libc++" "CXX" CACHE)
+   endif()
 endif()
 
 # Check for OS support ..
