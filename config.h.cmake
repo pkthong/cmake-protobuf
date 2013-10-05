@@ -83,6 +83,9 @@
 /* Enable classes using zlib compression. */
 #cmakedefine HAVE_ZLIB 1
 
+/* Enable C++ Exceptions*/
+#cmakedefine PROTOBUF_USE_EXCEPTIONS
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #cmakedefine LT_OBJDIR
